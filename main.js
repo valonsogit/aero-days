@@ -1,11 +1,13 @@
 const fs = require('fs')
-const compress_images = require('compress-images');
+var CWebp = require('cwebp').CWebp;
 
 const {
     createCanvas,
     loadImage,
     registerFont
 } = require('canvas')
+const cwebp = require('cwebp');
+
 const {
     Client,
     MessageMedia
@@ -13,7 +15,6 @@ const {
 const qrcode = require('qrcode-terminal');
 
 const sharp = require('sharp');
-
 
 
 function formatDate(date) {
@@ -191,52 +192,22 @@ async function createAeroImage() {
                     flags: "w"
                 }))
                 .on('close', function () {
-                    compress_images(
-                        `./temp_aero_files/${filename}.png`,
-                        "aero_files/", {
-                            compress_force: false,
-                            statistic: true,
-                            autoupdate: true
-                        },
-                        false, {
-                            jpg: {
-                                engine: "false",
-                                command: false
-                            }
-                        }, {
-                            png: {
-                                engine: "webp",
-                                command: false
-                            }
-                        }, {
-                            svg: {
-                                engine: false,
-                                command: false
-                            }
-                        }, {
-                            gif: {
-                                engine: false,
-                                command: false
-                            }
-                        },
-                        function (error, completed, statistic) {
-                            if (error != null) {
-                                reject(error)
+                    CWebp(`./temp_aero_files/${filename}.png`).stream().pipe(fs.createWriteStream(`./aero_files/${filename}.webp`, {
+                        flags: "w"
+                    }).on('close', function () {
+                        fs.rmSync(`./temp_aero_files/${filename}.png`)
 
-                            } else {
-                                fs.renameSync(`./aero_files/${filename}.png`, `./aero_files/${filename}.webp`);
-                                fs.rmSync(`./temp_aero_files/${filename}.png`)
+                        resolve(`./aero_files/${filename}.webp`)
+                    }));
 
-                                resolve(`./aero_files/${filename}.webp`)
-
-                            }
-                        }
-                    )
                 })
         }))
     })
 
 }
+
+
+
 
 async function main() {
     const SESSION_FILE_PATH = './session.json';
@@ -304,4 +275,4 @@ async function main() {
     client.initialize();
 
 }
-main()
+createAeroImage()
