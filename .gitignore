@@ -9,17 +9,19 @@ Desktop.ini
 node_modules/
 .history/
 .vscode/
-aero_files/
-temp_aero_files/
+aero_files/*
+temp_aero_files/*
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-
+/test.js
+/test.html
+/session.json
+/canvasjs.js
 # Windows Installer files
 *.cab
 *.msi
 *.msm
 *.msp
-
 # Windows shortcuts
 *.lnk
 
